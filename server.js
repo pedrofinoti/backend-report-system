@@ -35,15 +35,16 @@ app.post("/upload", upload.array("images", 3), (req, res) => {
   const { name, location, description } = req.body;
   const images = req.files ? req.files.map((file) => file.path) : [];
 
-  if (!name || !location || !description) {
+  if (!location || !description) {
     return res.status(400).json({ message: "Todos os campos são obrigatórios." });
   }
 
-  const newReport = { id: reports.length + 1, name, location, description, images };
+  const newReport = { id: reports.length + 1, location, description, images };
   reports.push(newReport);
   
   res.json({ message: "Apontamento recebido!", report: newReport });
 });
+
 
 // Rota para listar apontamentos
 app.get("/reports", (req, res) => {
