@@ -5,7 +5,7 @@ const path = require("path");
 const fs = require("fs");
 
 const app = express();
-const port = process.env.PORT || 10000;
+const port = process.env.PORT || 5000;
 
 // Criar a pasta 'uploads' se não existir
 const uploadDir = path.join(__dirname, "uploads");
@@ -27,24 +27,28 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static(uploadDir));
 
-// Armazena os apontamentos em memória (substituir por BD em produção)
+// Armazena os apontamentos em memória
 let reports = [];
+
+// Rota inicial para testar se o backend está ativo
+app.get("/", (req, res) => {
+  res.send("API rodando corretamente!");
+});
 
 // Rota para upload de apontamento
 app.post("/upload", upload.array("images", 3), (req, res) => {
   const { name, location, description } = req.body;
   const images = req.files ? req.files.map((file) => file.path) : [];
 
-  if (!location || !description) {
+  if (!name || !location || !description) {
     return res.status(400).json({ message: "Todos os campos são obrigatórios." });
   }
 
-  const newReport = { id: reports.length + 1, location, description, images };
+  const newReport = { id: reports.length + 1, name, location, description, images };
   reports.push(newReport);
-  
+
   res.json({ message: "Apontamento recebido!", report: newReport });
 });
-
 
 // Rota para listar apontamentos
 app.get("/reports", (req, res) => {
